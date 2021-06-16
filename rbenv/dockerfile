@@ -1,42 +1,47 @@
 FROM ubuntu:20.04
 
-# update apt cache and install dependencies
-RUN apt-get update && apt-get install git curl build-essential libssl-dev libreadline-dev zlib1g-dev sqlite3 libsqlite3-dev -y
+ARG DEBIAN_FRONTEND=noninteractive
 
-# add app user
-# set user to jekyll  
-# set home paht
-RUN adduser --gecos '' --disabled-password jekyll
-USER jekyll 
-ENV HOME /home/jekyll
+## Change here to set persnal evironment ##
+
+## Personal setting end ##
+
+# root commands
+# update apt cache and install dependencies
+RUN apt-get update && apt-get install -y \ 
+		      vim \ 
+		      apt-utils \ 
+		      git \
+		      curl \
+		      build-essential \
+		      libssl-dev \
+		      libreadline-dev \
+		      zlib1g-dev \
+		      sqlite3 \
+		      libsqlite3-dev \
+		      openssh-server
 
 # set rbenv, ruby-build bin paths
-ENV PATH $HOME/.rbenv/shims:$HOME/.rbenv/bin:$HOME/.rbenv/plugins/ruby-build/bin:$PATH
+RUN groupadd rbenv
 
 # clone rbenv
-RUN git clone git://github.com/sstephenson/rbenv.git ~/.rbenv
+RUN mkdir -p /usr/local/rbenv
+
+RUN git clone git://github.com/sstephenson/rbenv.git /usr/local/rbenv
 
 # clone ruby-build
-RUN git clone git://github.com/sstephenson/ruby-build.git ~/.rbenv/plugins/ruby-build
+RUN mkdir -p /usr/local/rbenv/plugins
+RUN mkdir -p /usr/local/rbenv/plugins/ruby-build
 
-# set working directory to project src
-WORKDIR /src
+RUN git clone git://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build
 
-RUN git clone https://github.com/jerry901/jerry901.github.io.git
-# add Gemfile, Gemfile.lock, .ruby-version to docker
-# ADD Gemfile Gemfile.lock .ruby-version ./
+RUN chgrp -R rbenv /usr/local/rbenv
+RUN chmod -R g+rwxXs /usr/local/rbenv
 
-# install ruby
-RUN rbenv install 2.6.3
-RUN rbenv global 2.6.3
+ENV RBENV_ROOT=/usr/local/rbenv
+ENV PATH $RBENV_ROOT/shims:$RBENV_ROOT/bin:$RBENV_ROOT/plugins/ruby-build/bin:$PATH
 
-# install bundler
-RUN gem install bundler
+RUN echo 'export RBENV_ROOT=/usr/local/rbenv' >> ~/.bashrc
+RUN echo 'export PATH=${RBENV_ROOT}/shims:${RBENV_ROOT}/bin:${RBENV_ROOT}/plugins/ruby-build/bin:${PATH}' >> ~/.bashrc
 
-# install app dependencies
-RUN bundle install
-
-# run rails
-# CMD ["bundle", "exec", "rails", "server"]
-
-EXPOSE 3000
+RUN echo 'eval "$(rbenv init -)" #changed this to below because of slow startup' >> ~/.bashrc

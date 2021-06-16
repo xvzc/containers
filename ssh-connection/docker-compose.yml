@@ -2,15 +2,16 @@ version: "3.3"
 
 services:
   local:  
-    image: rbenv:latest
+    image: ssh:latest 
     stdin_open: true # docker run -i
     tty: true        # docker run -t
+    ports:
+      - "20022:22"
     environment:
       TZ: Asia/Seoul
     networks:
-      - rbenv
+      - ssh
 
     restart: always
-
 networks:
-  rbenv:
+  ssh:

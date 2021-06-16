@@ -1,16 +1,18 @@
 version: "3.3"
 
 services:
-  local:  
-    image: rbenv:latest
+  env:  
+    image: sandbox:latest
     stdin_open: true # docker run -i
     tty: true        # docker run -t
+    ports:
+      - '20122:22'
     environment:
       TZ: Asia/Seoul
     networks:
-      - rbenv
+      - sandbox 
 
     restart: always
 
 networks:
-  rbenv:
+  sandbox:

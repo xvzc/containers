@@ -1,0 +1,39 @@
+FROM ubun2:latest
+
+
+## Change here to set personal information ##
+ARG DEBIAN_FRONTEND=noninteractive \ 
+    SOURCE_DIR=src 
+
+ENV USER_NAME sandbox
+ENV HOME /home/$USER_NAME
+## end ##
+
+RUN adduser --gecos '' --disabled-password $USER_NAME;
+
+# change user group
+RUN usermod -g staff sandbox; \
+    usermod -G sudo sandbox
+
+RUN mkdir -p $HOME/$SOURCE_DIR
+WORKDIR $HOME/$SOURCE_DIR
+
+# oh my zsh
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"; \
+    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \ 
+	      ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting;
+
+# zsh setting
+RUN sed -i '1s/^/ZSH_DISABLE_COMPFIX="true"\n/' ~/.zshrc; \ 
+    sed -i 's/robbyrussell/pmcgee/g' ~/.zshrc; \ 
+    sed -i 's/plugins=(git)/plugins=(git zsh-syntax-highlighting)/g' ~/.zshrc; \ 
+    echo 'set -o vi' >> ~/.zshrc;
+
+# change owner of $HOME 
+RUN chown -R $USER_NAME:staff $HOME; \ 
+    chsh -s $(which zsh) $USER_NAME;
+
+# run zsh with $USER_NAME to avoid .zompdump being created as root previlage
+ENTRYPOINT service ssh restart && (su $USER_NAME; zsh)
+
+EXPOSE 22

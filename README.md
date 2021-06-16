@@ -5,8 +5,9 @@
 ```dockerfile
 FROM ubuntu:latest
 
-RUN apt-get update -y
-RUN apt-get install htop -y
+# install lib dependencies
+# debconf: delaying package configuration, since apt-utils is not installed
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 
 CMD ["echo", "Hello World!!"]
 ```
@@ -31,6 +32,22 @@ We can simply create a container from docker run command with the image that we 
  $ docker run -t image_name:0.0 ./
 ```
 
+## How to attach to terminal inside of containers
+```bash
+ $ docker exec -ti container_name_or_id bash
+ $ docker exec -ti -u root container_name_or_id bash // as root
+```
+
+## How to set password for containers
+ first, attach to a container as a root
+```bash
+ $ docker exec -ti -u root container_name_or_id bash // as root
+```
+ and then, run command below and set the password
+```bash
+ $ passwd               // set root password
+ $ passwd [username]    // set user password
+```
 
 
 ## Docker Commands

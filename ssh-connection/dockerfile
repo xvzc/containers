@@ -1,0 +1,21 @@
+FROM ruby:2.6.3
+
+RUN apt-get update && apt-get install apt-utils vim git curl build-essential libssl-dev libreadline-dev zlib1g-dev sqlite3 libsqlite3-dev -y
+RUN apt-get install openssh-server -y
+
+ARG USER_NAME=ssh-con
+ENV USER_NAME $USER_NAME
+ARG SOURCE_DIR=src
+## Personal setting end ##
+
+RUN adduser --gecos '' --disabled-password $USER_NAME
+
+USER $USER_NAME
+
+ENV HOME /home/$USER_NAME
+
+# mkdir first to avoid permission denied error; when WORKDIR doesn't exist, it creates the directory as a root previllage
+RUN mkdir -p ~/$SOURCE_DIR
+WORKDIR /$SOURCE_DIR
+
+EXPOSE 22

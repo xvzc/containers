@@ -1,0 +1,32 @@
+FROM rbenv:latest
+
+## Change here to set personal information ##
+ARG USER_NAME=rbenv
+ARG SOURCE_DIR=src
+ARG GIT_URL=https://github.com/jerry901
+ARG REPO_NAME=jerry901.github.io.git
+## end ##
+
+USER $USER_NAME
+
+# ENV HOME /home/$USER_NAME
+
+RUN mkdir -p $HOME/$SOURCE_DIR
+WORKDIR $HOME/$SOURCE_DIR
+
+# user commands 
+# mkdir first to avoid permission denied error; when WORKDIR doesn't exist, it creates the directory as a root previllage
+
+########## preferences ##########
+RUN mkdir $HOME/$SOURCE_DIR/$REPO_NAME
+RUN git clone $GIT_URL/$REPO_NAME $HOME/$SOURCE_DIR/$REPO_NAME
+
+# install app dependencies
+RUN (cd $HOME/$SOURCE_DIR/$REPO_NAME && bundle install)
+
+RUN echo 'set -o vi' >> ~/.bashrc
+RUN bash
+
+EXPOSE 4000
+EXPOSE 22
+#######################################
