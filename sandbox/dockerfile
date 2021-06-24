@@ -33,6 +33,8 @@ RUN sed -i '1s/^/ZSH_DISABLE_COMPFIX="true"\n/' ~/.zshrc; \
 RUN chown -R $USER_NAME:staff $HOME; \ 
     chsh -s $(which zsh) $USER_NAME;
 
+RUN git config --global init.defaultBranch main
+
 # run zsh with $USER_NAME to avoid .zompdump being created as root previlage
 ENTRYPOINT service ssh restart && (su $USER_NAME; zsh)
 

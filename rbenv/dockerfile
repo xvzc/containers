@@ -1,47 +1,31 @@
-FROM ubuntu:20.04
+FROM ubun2:latest
 
+# set this argument to install openssh-server without any keyboard interactions.
 ARG DEBIAN_FRONTEND=noninteractive
 
-## Change here to set persnal evironment ##
+# update apt cache and install library dependencies.
 
-## Personal setting end ##
+# set default shell to ZSH.
+RUN chsh -s $(which zsh);
 
-# root commands
-# update apt cache and install dependencies
-RUN apt-get update && apt-get install -y \ 
-		      vim \ 
-		      apt-utils \ 
-		      git \
-		      curl \
-		      build-essential \
-		      libssl-dev \
-		      libreadline-dev \
-		      zlib1g-dev \
-		      sqlite3 \
-		      libsqlite3-dev \
-		      openssh-server
+# make a directory for rbenv, ruby-build.
 
-# set rbenv, ruby-build bin paths
-RUN groupadd rbenv
-
-# clone rbenv
-RUN mkdir -p /usr/local/rbenv
-
+# clone rbenv.
 RUN git clone git://github.com/sstephenson/rbenv.git /usr/local/rbenv
 
-# clone ruby-build
-RUN mkdir -p /usr/local/rbenv/plugins
-RUN mkdir -p /usr/local/rbenv/plugins/ruby-build
+RUN mkdir -p /usr/local/rbenv/plugins; \
+    git clone git://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build
 
-RUN git clone git://github.com/sstephenson/ruby-build.git /usr/local/rbenv/plugins/ruby-build
+# change group, permisson of rbenv so that any other users can use rbenv.
+RUN chgrp -R staff /usr/local/rbenv; \ 
+    chmod -R g+rwxXs /usr/local/rbenv;
 
-RUN chgrp -R rbenv /usr/local/rbenv
-RUN chmod -R g+rwxXs /usr/local/rbenv
-
-ENV RBENV_ROOT=/usr/local/rbenv
+# set bin paths for rbenv, ruby-build .
+ENV RBENV_ROOT /usr/local/rbenv  
 ENV PATH $RBENV_ROOT/shims:$RBENV_ROOT/bin:$RBENV_ROOT/plugins/ruby-build/bin:$PATH
 
-RUN echo 'export RBENV_ROOT=/usr/local/rbenv' >> ~/.bashrc
-RUN echo 'export PATH=${RBENV_ROOT}/shims:${RBENV_ROOT}/bin:${RBENV_ROOT}/plugins/ruby-build/bin:${PATH}' >> ~/.bashrc
-
-RUN echo 'eval "$(rbenv init -)" #changed this to below because of slow startup' >> ~/.bashrc
+# set environment variables in case of attaching trough a SSH connection.
+RUN echo "export RBENV_ROOT=$(echo $RBENV_ROOT)" >> ~/.zshrc; \
+    echo "export PATH=$(echo $PATH)" >> ~/.zshrc; \ 
+    echo 'eval "$(rbenv init -)" #changed this to below because of slow startup' >> ~/.zshrc; \
+    echo "export LC_ALL=en_US.UTF-8" >> ~/.zshrc 
