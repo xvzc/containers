@@ -1,0 +1,25 @@
+FROM ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# latest git
+RUN apt-get update
+RUN apt-get update && apt-get install -y \ 
+		      curl \
+		      build-essential \
+		      libssl-dev \
+		      libreadline-dev \
+		      zlib1g-dev \
+		      libsqlite3-dev \
+		      locales
+
+
+RUN locale-gen en_US.UTF-8
+
+ENV LANG en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+
+RUN echo 'LANGUAGE=en_US.UTF-8' >> /etc/environment
+RUN echo 'LANG=en_US.UTF-8' >> /etc/environment
+RUN echo 'LC_ALL=en_US.UTF-8' >> /etc/environment

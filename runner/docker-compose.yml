@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  env:  
+    image: ubun2:latest
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    environment:
+      TZ: Asia/Seoul
+    networks:
+      - ubun2
+
+    restart: always
+
+networks:
+  ubun2:
