@@ -4,8 +4,8 @@ FROM rbenv:latest
 ARG DEBIAN_FRONTEND=noninteractive \ 
     DEFAULT_RUBY_VERSION=2.6.3 \
     SOURCE_DIR=src \
-    GIT_URL=https://github.com/jerry901 \
-    REPO_NAME=jerry901.github.io.git
+    GIT_URL=https://github.com/xvzc \
+    REPO_NAME=xvzc.github.io.git
 
 ENV USER_NAME jekyll
 ENV HOME /home/$USER_NAME
